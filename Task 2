@@ -1,1 +1,41 @@
+import cv2
+import numpy as np
 
+# определяем словарь и размер маркера
+dictionary = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_250)
+marker_size = 100
+
+# определяем параметры для обнаружения маркеров
+parameters = cv2.aruco.DetectorParameters_create()
+
+# загружаем камеру
+cap = cv2.VideoCapture(0)
+
+while True:
+    # считываем кадр с камеры
+    ret, frame = cap.read()
+
+    # определяем маркеры в кадре
+    corners, ids, rejected = cv2.aruco.detectMarkers(frame, dictionary, parameters=parameters)
+
+    # если маркер обнаружен, рисуем его на кадре
+    if ids is not None:
+        # рисуем маркер на кадре
+        cv2.aruco.drawDetectedMarkers(frame, corners, ids)
+
+        # получаем положение и ориентацию маркера
+        rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, marker_size, cameraMatrix, distCoeffs)
+
+        # рисуем ось на кадре
+        cv2.aruco.drawAxis(frame, cameraMatrix, distCoeffs, rvecs, tvecs, marker_size)
+
+    # отображаем кадр
+    cv2.imshow('frame', frame)
+
+    # выходим из цикла
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# освобождаем камеру и закрываем окно
+cap.release()
+cv2.destroyAllWindows()
