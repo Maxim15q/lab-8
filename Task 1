@@ -1,1 +1,17 @@
+import cv2
 
+# загрузим изображение
+img = cv2.imread('variant-6.png')
+
+# получаем размеры исходного изображения
+height, width, channels = img.shape
+
+# определяем новые размеры
+new_height = int(height * 2)
+new_width = int(width * 2)
+
+# изменяем размер изображения
+stretched_img = cv2.resize(img, (new_width, new_height))
+
+# сохраняем растянутое изображение
+cv2.imwrite('stretched_image.png', stretched_img)
