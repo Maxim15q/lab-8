@@ -1,26 +1,26 @@
 import cv2
 import numpy as np
 
-# Define the dictionary and marker size
+# определяем словарь и размер маркера
 dictionary = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_250)
 marker_size = 100
 
-# Define the parameters for the marker detection
+# определяем параметры для обнаружения маркеров
 parameters = cv2.aruco.DetectorParameters_create()
 
-# Load the camera
+# загружаем камеру
 cap = cv2.VideoCapture(0)
 
 while True:
-    # Read a frame from the camera
+    #  считываем кадр с камеры
     ret, frame = cap.read()
 
-    # Detect the markers in the frame
+    # определяем маркеры в кадре
     corners, ids, rejected = cv2.aruco.detectMarkers(frame, dictionary, parameters=parameters)
 
-    # If a marker is detected, draw it on the frame
+    # если маркер обнаружен, рисуем его на кадре
     if ids is not None:
-        # Split the marker into two halves
+        # разделяем маркер на две половины
         half_width = int(corners[0][0][1][0] - corners[0][0][0][0]) // 2
         left_half = np.array([[[corners[0][0][0][0], corners[0][0][0][1]],
                                [corners[0][0][0][0] + half_width, corners[0][0][0][1]],
@@ -31,31 +31,31 @@ while True:
                                 [corners[0][0][2][0], corners[0][0][2][1]],
                                 [corners[0][0][2][0] - half_width, corners[0][0][2][1]]]], dtype=np.float32)
 
-        # Draw the left half of the marker on the frame
+        # рисуем левую половину маркера на кадре
         cv2.aruco.drawDetectedMarkers(frame, left_half, ids)
 
-        # Get the position and orientation of the left half of the marker
+        # получаем положение и ориентацию левой половины маркера
         rvecs_left, tvecs_left, _ = cv2.aruco.estimatePoseSingleMarkers(left_half, marker_size, cameraMatrix, distCoeffs)
 
-        # Draw the axis for the left half of the marker
+        # рисуем ось для левой половины маркера
         cv2.aruco.drawAxis(frame, cameraMatrix, distCoeffs, rvecs_left, tvecs_left, marker_size)
 
-        # Draw the right half of the marker on the frame
+        # рисуем правую половину маркера на кадре
         cv2.aruco.drawDetectedMarkers(frame, right_half, ids)
 
-        # Get the position and orientation of the right half of the marker
+        # получаем положение и ориентацию правой половины маркера
         rvecs_right, tvecs_right, _ = cv2.aruco.estimatePoseSingleMarkers(right_half, marker_size, cameraMatrix, distCoeffs)
 
-        # Draw the axis for the right half of the marker
+        # рисуем ось для правой половины маркера
         cv2.aruco.drawAxis(frame, cameraMatrix, distCoeffs, rvecs_right, tvecs_right, marker_size)
 
-    # Display the frame
+    # отображаем кадр
     cv2.imshow('frame', frame)
 
-    # Exit the loop if 'q' is pressed
+    # выходим из цикла
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-# Release the camera and close the window
+# освобождаем камеру и закрываем окно
 cap.release()
 cv2.destroyAllWindows()
